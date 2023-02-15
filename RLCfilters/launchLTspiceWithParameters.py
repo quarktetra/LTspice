@@ -16,7 +16,7 @@ from PyLTSpice.LTSpice_RawRead import RawRead
 def runLTspice(simname,**kwargs):
   theWD = os.getcwd()
   target_dir = os.path.dirname(simname)
-
+  print(target_dir)
   if( target_dir != ""):
     simname = os.path.basename(simname)
     os.chdir(target_dir)
@@ -47,6 +47,44 @@ def runLTspice(simname,**kwargs):
   os.chdir(theWD)
 
 
-runLTspice(f"9_1MHzBP.asc")
 
+
+params = {
+  "C1":"174p",
+  "L1": "1800n",
+  "pointsPerDecade": "100" ,
+  "freqStop":"100Meg",
+   "freqStart": "1Meg"
+}
+
+with open("paramE.txt","w") as f:
+    for key in params:
+      f.write(".param {:s} {:s}\n".format( key,params[key]  ))
+    f.write("\n")
+    f.close()
+
+
+fileName="9_1MHzBPwithExtParam"
+runLTspice(fileName+".asc")
+filepath = fileName+'.raw'     # will have several columns. We are interested in  frequency and V(vout9.1)
+LTR = RawRead(filepath)
+
+print(LTR.get_trace_names())
+#print(LTR.get_raw_property())
+
+xa= LTR.get_trace("frequency")
+xa=np.asarray(xa).real      # converting to np for later analysis
+ya= LTR.get_trace("V(vout9.1)")
+ya=np.asarray(ya)   # this is in complex form, cartesian apparently
+ya=np.abs(ya)
+
+plt.plot(xa, ya)    #Amplitude vs Freq.
+plt.grid(True, which="both", ls="-")
+plt.xscale('log')
+plt.xlabel("Frequency(Hz)")
+plt.ylabel("Gain")
+plt.title("Frequency responce of the BandPass filter C1:" +params["C1"]+"; L1:" +params["L1"])
+plt.savefig('9_1MHzBP_freq_response_withParameters.png', dpi=300)
+
+plt.show()
 

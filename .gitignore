@@ -1,0 +1,7 @@
+
+RLCfilters/setwd.py
+/RLCfilters/*.log
+/RLCfilters/*.net
+/aLIGORFfilters/*.raw
+/aLIGORFfilters/*.log
+/aLIGORFfilters/*.net

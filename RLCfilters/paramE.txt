@@ -1,5 +1,5 @@
-.param C1 174p
-.param L1 1800n
+.param C1 1.74p
+.param L1 180000n
 .param pointsPerDecade 100
 .param freqStop 100Meg
 .param freqStart 1Meg

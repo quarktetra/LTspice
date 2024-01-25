@@ -1,6 +1,3 @@
-# Modified from: https://github.com/acidbourbon/numpy_ltspice_filter
-# this codes simply executes LTspice on a .asc file
-
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +7,7 @@ from scipy import interpolate, signal
 import filecmp
 from shutil import copyfile
 import sys
-from PyLTSpice.LTSpice_RawRead import RawRead
+from PyLTSpice import RawRead
 
 
 def runLTspice(simname,**kwargs):
@@ -45,8 +42,4 @@ def runLTspice(simname,**kwargs):
       subprocess.run([*ltspice_command.split(), "{:s}.asc".format(simname)])
 
   os.chdir(theWD)
-
-
-runLTspice(f"9_1MHzBP.asc")
-
-
+runLTspice(f"C:\\Users\\451516\\Documents\\github\\aLIGOrfPhotoDetectors\\LSC RFPD Simulation Files\\BluePrints\\2S1N.asc")

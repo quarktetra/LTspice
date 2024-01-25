@@ -10,9 +10,10 @@ from scipy import interpolate, signal
 import filecmp
 from shutil import copyfile
 import sys
-from PyLTSpice.LTSpice_RawRead import RawRead
+from PyLTSpice import RawRead
 
-
+analysisType="gain"
+analysisType="noise"
 def runLTspice(simname,**kwargs):
   theWD = os.getcwd()
   target_dir = os.path.dirname(simname)
@@ -50,8 +51,8 @@ def runLTspice(simname,**kwargs):
 
 
 params = {
-  "C1":"174p",
-  "L1": "1800n",
+  "C1":"1.74p",
+  "L1": "180000n",
   "pointsPerDecade": "100" ,
   "freqStop":"100Meg",
    "freqStart": "1Meg"
@@ -63,28 +64,52 @@ with open("paramE.txt","w") as f:
     f.write("\n")
     f.close()
 
+if analysisType=="gain":
+    fileName="9_1MHzBPwithExtParam"
+else:
+    fileName="9_1MHzBPNoisewithExtParam"
 
-fileName="9_1MHzBPwithExtParam"
 runLTspice(fileName+".asc")
 filepath = fileName+'.raw'     # will have several columns. We are interested in  frequency and V(vout9.1)
 LTR = RawRead(filepath)
 
 print(LTR.get_trace_names())
-#print(LTR.get_raw_property())
+print(LTR.get_raw_property())
 
-xa= LTR.get_trace("frequency")
-xa=np.asarray(xa).real      # converting to np for later analysis
-ya= LTR.get_trace("V(vout9.1)")
-ya=np.asarray(ya)   # this is in complex form, cartesian apparently
-ya=np.abs(ya)
+if analysisType=="gain":
+    xa= LTR.get_trace("frequency")
+    xa=np.asarray(xa).real      # converting to np for later analysis
+    ya= LTR.get_trace("V(vout9.1)")
+    ya=np.asarray(ya)   # this is in complex form, cartesian apparently
+    ya=np.abs(ya)
 
-plt.plot(xa, ya)    #Amplitude vs Freq.
-plt.grid(True, which="both", ls="-")
-plt.xscale('log')
-plt.xlabel("Frequency(Hz)")
-plt.ylabel("Gain")
-plt.title("Frequency responce of the BandPass filter C1:" +params["C1"]+"; L1:" +params["L1"])
-plt.savefig('9_1MHzBP_freq_response_withParameters.png', dpi=300)
+    plt.plot(xa, ya)    #Amplitude vs Freq.
+    plt.grid(True, which="both", ls="-")
+    plt.xscale('log')
+    plt.xlabel("Frequency(Hz)")
+    plt.ylabel("Gain")
+    plt.title("Frequency responce of the BandPass filter C1:" +params["C1"]+"; L1:" +params["L1"])
+    plt.savefig('9_1MHzBP_freq_response_withParameters.png', dpi=300)
+
+if analysisType=="noise":
+    xa= LTR.get_trace("frequency")
+    xa=np.asarray(xa).real      # converting to np for later analysis
+    ya= LTR.get_trace("V(onoise)")
+
+    gain= LTR.get_trace("gain")
+    ya=np.divide(ya, gain)
+    ya=np.asarray(ya)   # this is in complex form, cartesian apparently
+    ya=np.abs(ya)
+
+    plt.plot(xa, ya)    #Amplitude vs Freq.
+    plt.grid(True, which="both", ls="-")
+    plt.xscale('log')
+    plt.xlabel("Frequency(Hz)")
+    plt.ylabel("Noise")
+    plt.title("Frequency noise responce of the BandPass filter C1:" +params["C1"]+"; L1:" +params["L1"])
+    #plt.savefig('9_1MHzBP_freq_response_withParameters.png', dpi=300)
+    plt.savefig('9_1MHzBPNoise_freq_response_withParameters.png', dpi=300)
 
 plt.show()
+
 

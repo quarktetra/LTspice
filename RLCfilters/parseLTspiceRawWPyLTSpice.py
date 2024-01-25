@@ -20,7 +20,7 @@ filepath = '9_1MHzBP.raw'     # will have several columns. We are interested in 
 LTR = RawRead(filepath)
 
 print(LTR.get_trace_names())
-print(LTR.get_raw_property())
+#print(LTR.get_raw_property())
 
 xa= LTR.get_trace("frequency")
 xa=np.asarray(xa).real      # converting to np for later analysis
@@ -31,5 +31,10 @@ ya=np.abs(ya)
 plt.plot(xa, ya)    #Amplitude vs Freq.
 plt.grid(True, which="both", ls="-")
 plt.xscale('log')
+plt.xlabel("Frequency(Hz)")
+plt.ylabel("Gain")
+plt.title("Frequency responce of the BandPass filter")
+plt.savefig('9_1MHzBP_freq_response.png', dpi=300)
+
 plt.show()
 
